@@ -1,8 +1,8 @@
-# MySecondSymfony
+# Entities1
 
 Installation de la version lts avec la majorité des bibliothèques pour un site web
 
-```symfony new MySecondSymfony --webapp --version=lts```
+```symfony new Entities1 --webapp --version=lts```
 
 Mise à jour des versions de sécurités
 
@@ -28,7 +28,7 @@ L'adresse est généralement de type  https://127.0.0.1:8000/
 
 ou
 
-``php bin/console make:controller NomController``
+``php bin/console make:controller MainController``
 
 Le nom doit être en Pascal case terminé par controller, mais symfony se charge de
 le corriger en cas d'oubli
@@ -41,13 +41,14 @@ On va vérifier la route par défaut
 ## Modification de la route
 
 ```
- src/controller/HomeController.php
+ src/controller/MainController.php
   #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
     {
-        return $this->render('home/index.html.twig', [
+        return $this->render('main/index.html.twig', [
             'title' => 'Homepage',
+            'homepage_text' => "Nous sommes le ".date('d/m/Y \à H:i')
         ]);
     }
  
@@ -57,27 +58,29 @@ On peut accéder à l'accueil depuis la racine de notre site
 
 ``https://127.0.0.1:8000/``
 
-## Modification de 'HomeController'
+## Modification de 'MainController'
 ```php
 <?php
 
 
 
-class HomeController extends AbstractController
+class MainController extends AbstractController
 {
-    #[Route('/', name: 'homepage')]
+     #[Route('/', name: 'homepage')]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig', [
-            'title' => 'Homepage',
+        return $this->render('main/index.html.twig', [
+            'title' => 'homepage',
+            'homepage_text' => "Nous sommes le ".date('d/m/Y \à H:i')
         ]);
     }
 
     #[Route('/about', name: 'about_me')]
     public function aboutMe(): Response
     {
-        return $this->render('home/about.html.twig', [
+        return $this->render('main/about.html.twig', [
             'title' => 'About me',
+            'homepage_text' => "Nous sommes le ".date('d/m/Y \à H:i')
         ]);
     }
 }
@@ -89,7 +92,7 @@ class HomeController extends AbstractController
 ```twig
  {# templates/base.html.twig #}
  
-  <title>{% block title %}MySecondSymfony{% endblock %}</title>
+  <title>{% block title %}Entities1{% endblock %}</title>
 ```
 
 ## Modification de index.html.twig
@@ -98,6 +101,7 @@ class HomeController extends AbstractController
 {% extends 'base.html.twig' %}
 {# on surcharge le bloc title avec {{ parent  }} et le titre
 passé par le contrôleur #}
+
 {% block title %}{{ parent() }} | {{ title }}{% endblock %}
 
 {% block body %}
