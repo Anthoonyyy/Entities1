@@ -590,8 +590,19 @@ use Doctrine\ORM\Mapping as ORM;
 }
 ```
 
+### Création d'un tag en git
+
+```
+git tag -a v0.1 -m"Post M2M section"
+git push origin v0.1
 
 
+```
+[tag v0.1](https://github.com/Anthoonyyy/Entities1/releases/tag/v0.1)
+
+### CRUD de `Post` et `Section`
+
+Nous allons les faire dans une nouvelle branche car nous n'en aurons pas besoin immédiatement
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
 
