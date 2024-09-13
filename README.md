@@ -468,6 +468,36 @@ Faire la migration
 Vous pouvez migrer vers la DB, et voir le format colle à vos exigences MySQL en regardant la DB
 
 
+### Création de nos tables
+
+La table `post` existe déjà, on va créer les tables suivantes, vides par défaut
+
+```
+php bin/console make:entity Section 
+php bin/console make:entity Tag
+php bin/console make:entity Comment
+```
+Nous effectuons une nouvelle migration
+
+On peut voir si on en a besoin avec
+
+``
+php bin/console doctrine:migrations:diff
+``
+
+Si c'est le cas, il va créer un fichier de migration comme
+
+``
+php bin/console make:migration
+``
+puis 
+
+``
+php bin/console d:m:m
+``
+
+
+
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
 
