@@ -496,6 +496,100 @@ puis
 php bin/console d:m:m
 ``
 
+### Remplissage de Section
+
+``
+php bin/console make:entity Section 
+``
+```php
+  #[ORM\Column(
+        # On souhaite ne pas perdre la moitié
+        # des numériques... donc unsigned !
+        options: [
+            'unsigned' => true,
+        ]
+
+    )]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 120)]
+    private ?string $sectionTitle = null;
+
+    #[ORM\Column(length: 600, nullable: true)]
+    private ?string $sectionDescription = null;
+```
+
+### Jointure de Post vers Section
+
+Jointure en `ManyToMany`, le choix de la table mère -enfant est faite lors de la création de la jointure, même si le `manytomany` est en principe `bidirectionnel`
+
+On va choisir le `parent` Post
+
+```bash
+php bin/console make:entity Post
+$ php bin/console make:entity Post
+ Your entity already exists! So let's add some new fields!
+
+ New property name (press <return> to stop adding fields):
+ > sections
+
+
+```
+
+Dans `src/Entity/Post.php`
+
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\PostRepository;
+# Utilisation d'ArrayCollection et des Collections
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+    # Jointure many to many vers Section
+
+    #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'posts')]
+    private Collection $sections;
+
+    public function __construct()
+    {
+        $this->sections = new ArrayCollection();
+    }
+
+   # ... Getters ans Setters
+   
+   # Si on veut récupérer les sections depuis le post
+
+    /**
+     * @return Collection<int, Section>
+     */
+    public function getSections(): Collection
+    {
+        return $this->sections;
+    }
+    # On veut rajouter des sections au Post actuel (update ou post )
+    public function addSection(Section $section): static
+    {
+        if (!$this->sections->contains($section)) {
+            $this->sections->add($section);
+        }
+
+        return $this;
+    }
+    # On veut pouvoir supprimer les sections depuis un Post
+    public function removeSection(Section $section): static
+    {
+        $this->sections->removeElement($section);
+
+        return $this;
+    }
+}
+```
+
 
 
 
