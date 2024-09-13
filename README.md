@@ -604,6 +604,15 @@ git push origin v0.1
 
 Nous allons les faire dans une nouvelle branche car nous n'en aurons pas besoin immédiatement
 
+
+`git checkout --b crudtemp`
+
+Puis nous allons créer le CRUD de `post` :
+
+`php bin/console make:crud`
+
+
+
 ### Mise en forme des formulaires et des pages avec `bootstrap`
 
 Nous allons utiliser les assets qui se trouvent dans le dossier `assets`
