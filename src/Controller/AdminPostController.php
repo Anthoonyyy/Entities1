@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Form\PostType;
+# Pour l'update on utilise un autre formulaire
+use App\Form\UpdatePostType;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,8 +28,13 @@ final class AdminPostController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $post = new Post();
+        // on souhaite qu'on ne puisse pas mettre directement
+        // postIsPublished sur true, on évite l'envoi de `null
+        // par défaut
+        $post->setPostIsPublished(false);
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($post);
@@ -53,7 +60,7 @@ final class AdminPostController extends AbstractController
     #[Route('/{id}/edit', name: 'app_admin_post_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(UpdatePostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

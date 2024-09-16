@@ -609,8 +609,18 @@ Nous allons les faire dans une nouvelle branche car nous n'en aurons pas besoin 
 
 Puis nous allons créer le CRUD de `post` :
 
-`php bin/console make:crud`
+`php bin/console make:crud Post`
 
+On va modifier notre menu
+
+```
+<nav>
+    {# On utilise path('nom du chemin') lorsqu'on veut un lien vers une autre page #}
+    <a href="{{ path('homepage') }}">Homepage</a>
+    <a href="{{ path('about_me') }}">About me </a>
+    <a href="{{ path('app_admin_post_index') }}">Post Crud</a>
+</nav>
+```
 
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
