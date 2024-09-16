@@ -3,10 +3,10 @@
 {% block title %}Section index{% endblock %}
 
 {% block body %}
-    <h1>Section index</h1>
+    <h1 class="text-center mt-5">Section index</h1>
 
-    <table class="table">
-        <thead>
+    <table class="table  w-50 mx-auto mt-5">
+        <thead class="table-dark">
             <tr>
                 <th>Id</th>
                 <th>SectionTitle</th>
@@ -33,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_admin_section_new') }}">Create new</a>
+    <a href="{{ path('app_admin_section_new') }}" class="d-flex justify-content-center text-black text-decoration-none">Create new</a>
 {% endblock %}

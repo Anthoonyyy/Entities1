@@ -3,11 +3,11 @@
 {% block title %}Post index{% endblock %}
 
 {% block body %}
-    <h1>Post index</h1>
+    <h1 class="text-center mt-5">Post index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
+    <table class="table w-50 mx-auto mt-5">
+        <thead class="table-dark">
+            <tr  class="text-center">
                 <th>Id</th>
                 <th>PostTitle</th>
                 <th>PostText</th>
@@ -19,7 +19,7 @@
         </thead>
         <tbody>
         {% for post in posts %}
-            <tr>
+            <tr class="text-center">
                 <td>{{ post.id }}</td>
                 <td>{{ post.postTitle }}</td>
                 <td>{{ post.postText }}</td>
@@ -39,5 +39,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_admin_post_new') }}">Create new</a>
+    <a href="{{ path('app_admin_post_new') }}" class="d-flex justify-content-center text-black text-decoration-none">Create new</a>
 {% endblock %}
