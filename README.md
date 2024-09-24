@@ -209,7 +209,7 @@ Passez vos paramètres de connexion dans l'ordre
 driver://utilisateur:mot_de_passe@ip_serveur:port/nomdelaDB?options
 
 ```bash
-DATABASE_URL="mysql://root:@127.0.0.1:3306/mysecondesymfonyc1?serverVersion=8.0.31&charset=utf8mb4"
+DATABASE_URL="mysql://root:@127.0.0.1:3306/entitiesg1?serverVersion=8.0.31&charset=utf8mb4"
 # DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
 # DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 ```
@@ -457,7 +457,6 @@ https://www.doctrine-project.org/projects/doctrine-orm/en/3.2/reference/attribut
 
 
 ```php
-# ON EST ICI
 
 php bin/console m:mi
 php bin/console d:m:m
@@ -467,48 +466,42 @@ Faire la migration
 
 Vous pouvez migrer vers la DB, et voir le format colle à vos exigences MySQL en regardant la DB
 
-
 ### Création de nos tables
 
-La table `post` existe déjà, on va créer les tables suivantes, vides par défaut
+La table `Post` existe déjà, on va créer les tables suivantes, vides par défaut (mise à part l'id)
 
-```
-php bin/console make:entity Section 
-php bin/console make:entity Tag
-php bin/console make:entity Comment
-```
-Nous effectuons une nouvelle migration
+    php bin/console make:entity Section
+    php bin/console make:entity Comment
+    php bin/console make:entity Tag
+
+Nous effectuons une nouvelle migration.
 
 On peut voir si on en a besoin avec
 
-``
-php bin/console doctrine:migrations:diff
-``
+    php bin/console doctrine:migrations:diff
 
 Si c'est le cas, il va créer un fichier de migration comme
 
-``
-php bin/console make:migration
-``
-puis 
+    php bin/console make:migration
 
-``
-php bin/console d:m:m
-``
+puis
+
+    php bin/console d:m:m
 
 ### Remplissage de Section
 
-``
-php bin/console make:entity Section 
-``
+    php bin/console make:entity Section
+
 ```php
-  #[ORM\Column(
+# ...
+#[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(
         # On souhaite ne pas perdre la moitié
         # des numériques... donc unsigned !
         options: [
             'unsigned' => true,
         ]
-
     )]
     private ?int $id = null;
 
@@ -517,22 +510,43 @@ php bin/console make:entity Section
 
     #[ORM\Column(length: 600, nullable: true)]
     private ?string $sectionDescription = null;
+# ...
 ```
 
 ### Jointure de Post vers Section
 
-Jointure en `ManyToMany`, le choix de la table mère -enfant est faite lors de la création de la jointure, même si le `manytomany` est en principe `bidirectionnel`
+Jointure en `ManyToMany`, le choix de la table mère - enfant est faite lors de la création de la jointure, même si le `manytomany` est en principe `bidirectionel`
 
 On va choisir le `parent` Post
 
+    php bin/console make:entity Post
+
 ```bash
 php bin/console make:entity Post
-$ php bin/console make:entity Post
  Your entity already exists! So let's add some new fields!
 
  New property name (press <return> to stop adding fields):
  > sections
 
+ Field type (enter ? to see all types) [string]:
+ 
+ > ManyToMany
+ManyToMany
+
+ What class should this entity be related to?:
+ > Section
+Section
+
+ Do you want to add a new property to Section so that you can access/update Post objects from it - e.g. $section->getPosts()? (yes/no) [yes]:
+ >
+
+ A new property will also be added to the Section class so that you can access the related Post objects from it.
+
+ New field name inside Section [posts]:
+ >
+
+ updated: src/Entity/Post.php
+ updated: src/Entity/Section.php
 
 ```
 
@@ -544,34 +558,41 @@ Dans `src/Entity/Post.php`
 namespace App\Entity;
 
 use App\Repository\PostRepository;
-# Utilisation d'ArrayCollection et des Collections
+# utilisation des ArrayCollection et des Collections
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 
-    # Jointure many to many vers Section
+# ...
 
+    /**
+     * Jointure many to many vers Section. Cet attribut est le parent et 
+     * est inversée par l'attribut de Section `posts`.
+     Ce many to many est bidirectionnel, pourtant, Post est le responsable de Section 
+     * @var Collection<int, Section>
+     */
     #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'posts')]
     private Collection $sections;
 
+    # un constructeur est créé.
     public function __construct()
     {
+        # il nous permet d'initialiser le tableau de type Collection
+        # pour éventuelles Sections
         $this->sections = new ArrayCollection();
     }
 
-   # ... Getters ans Setters
-   
-   # Si on veut récupérer les sections depuis le post
+   # ... getters and setters
 
     /**
+     * Si on veut récupérer les sections depuis le Post
      * @return Collection<int, Section>
      */
     public function getSections(): Collection
     {
         return $this->sections;
     }
-    # On veut rajouter des sections au Post actuel (update ou post )
+
+    // on veut rajouter des sections au Post actuel (update ou post)
     public function addSection(Section $section): static
     {
         if (!$this->sections->contains($section)) {
@@ -580,7 +601,8 @@ use Doctrine\ORM\Mapping as ORM;
 
         return $this;
     }
-    # On veut pouvoir supprimer les sections depuis un Post
+
+    // on veut pouvoir supprimer les sections depuis un Post
     public function removeSection(Section $section): static
     {
         $this->sections->removeElement($section);
@@ -588,39 +610,74 @@ use Doctrine\ORM\Mapping as ORM;
         return $this;
     }
 }
+
+```
+
+Et dans Dans `src/Entity/Section.php`
+
+```php
+<?php
+
+#...
+
+    /**
+     *  Relation M2M vers Post, mais on voit que le 'parent' mappedBy: est
+     *  l'attribut sections se trouvant dans POST, c'est l'enfant
+     * @var Collection<int, Post>
+     */
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'sections')]
+    private Collection $posts;
+
+    public function __construct()
+    {
+        $this->posts = new ArrayCollection();
+    }
+
+   /*
+    * Mêmes méthodes que de POST, mais pour récupérer, ajouter supprimer des
+    * post depuis Section
+    */
+    /**
+     * @return Collection<int, Post>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->addSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            $post->removeSection($this);
+        }
+
+        return $this;
+    }
+}
+
 ```
 
 ### Création d'un tag en git
 
-```
-git tag -a v0.1 -m"Post M2M section"
-git push origin v0.1
+    git tag -a v0.1 -m "Post M2M Section"
+    git push origin v0.1
 
+[tag v.0.1](https://github.com/WebDevCF2m2023/EntitiesG1/releases/tag/v0.1)
 
-```
-[tag v0.1](https://github.com/Anthoonyyy/Entities1/releases/tag/v0.1)
+### CRUD de Post et Section
 
-### CRUD de `Post` et `Section`
+Nous allons les faire dans une nouvelle branche, car nous n'en aurons pas besoin immédiatement :
 
-Nous allons les faire dans une nouvelle branche car nous n'en aurons pas besoin immédiatement
-
-
-`git checkout --b crudtemp`
-
-Puis nous allons créer le CRUD de `post` :
-
-`php bin/console make:crud Post`
-
-On va modifier notre menu
-
-```
-<nav>
-    {# On utilise path('nom du chemin') lorsqu'on veut un lien vers une autre page #}
-    <a href="{{ path('homepage') }}">Homepage</a>
-    <a href="{{ path('about_me') }}">About me </a>
-    <a href="{{ path('app_admin_post_index') }}">Post Crud</a>
-</nav>
-```
 
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
@@ -666,4 +723,185 @@ Et nos formulaires sont jolis !
 
 On peut utiliser toutes les classes de `bootstrap`
 
-## Manipulation des formulaires
+### On va compléter les tables présentes
+
+Création des relations et des champs de table :
+
+    php bin/console make:migration
+
+    php bin/console doctrine:migrations:migrate
+
+## Création des 'utilisateurs'
+
+    php bin/console make:user
+
+```bash
+$ php bin/console make:user
+
+ The name of the security user class (e.g. User) [User]: >
+
+ Do you want to store user data in the database (via Doctrine)? (yes/no) [yes]:
+ >
+
+ Enter a property name that will be the unique "display" name for the user (e.g. email, usernam
+e, uuid) [email]:
+ > username
+
+ Will this app need to hash/check user passwords? Choose No if passwords are not needed or will
+ be checked/hashed by some other system (e.g. a single sign-on server).
+
+ Does this app need to hash/check user passwords? (yes/no) [yes]:
+ >
+
+ created: src/Entity/User.php
+ created: src/Repository/UserRepository.php
+ updated: src/Entity/User.php
+ updated: config/packages/security.yaml
+
+
+  Success!
+
+
+ Next Steps:
+   - Review your new App\Entity\User class.
+   - Use make:entity to add more fields to your User entity and then run make:migration.
+   - Create a way to authenticate! See https://symfony.com/doc/current/security.html
+```
+
+Création d'une entité avec la particularité de permettre les connexions `src/Entity/User.php`. On va la modifier
+
+On peut aussi voir la gestion de la sécurité dans `config/packages/security.yaml`:
+
+```twig
+#...
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+# ...
+```
+
+On modifie nos tables pour pouvoir vérifier la cohérence en MySQL
+
+    php bin/console ma:mi
+    php bin/console d:m:m
+
+## Création d'une page de connexion
+
+    php bin/console make:security:form-login
+
+```bash
+php bin/console make:security:form-login
+
+ Choose a name for the controller class (e.g. SecurityController) [SecurityController]:
+ >
+
+ Do you want to generate a '/logout' URL? (yes/no) [yes]:
+ >
+
+ Do you want to generate PHPUnit tests? [Experimental] (yes/no) [no]:
+ >
+
+ created: src/Controller/SecurityController.php
+ created: templates/security/login.html.twig
+ updated: config/packages/security.yaml
+
+
+  Success!
+
+
+ Next: Review and adapt the login template: security/login.html.twig to suit your needs.
+```
+
+```yaml
+# config/packages/security.yaml
+
+# ...
+firewalls:
+  dev:
+    pattern: ^/(_(profiler|wdt)|css|images|js)/
+    security: false
+  main:
+    lazy: true
+    provider: app_user_provider
+    # notre firewall ouvre une porte pour User
+    form_login:
+      login_path: app_login
+      check_path: app_login
+      enable_csrf: true
+    logout:
+      path: app_logout
+# ...
+```
+
+Débogage des routes :
+
+    php bin/console de:r
+
+On va remplir la table `user`
+
+Avec le contenu suivant :
+
+- username
+    1) adminLee
+    2) redacGuy
+    3) userEr
+- roles ! json
+    1) ["ROLE_ADMIN","ROLE_REDAC","ROLE_USER"]
+    2) ["ROLE_REDAC","ROLE_USER"]
+    3) []
+- password : Il va falloir crypter les mots de passes avec
+
+  php bin/console security:hash-password
+
+1) 123admin123
+2) ad123min
+3) adddmin
+
+- user_mail
+  ici, vous choisissez
+- user_real_name
+  ici vous choisissez
+- user_active
+  true
+
+### Ajoutez login/logout au menu
+
+```twig
+{# templates/main/menu.html.twig #}
+<nav>
+    {# on utilise path('nom_du_chemin') lorsqu'on veut un lien vers une page #}
+    <a href="{{ path('homepage') }}">Homepage</a>
+    <a href="{{ path('about_me') }}">About me</a>
+    {# si on est connecté, on affiche la déconnexion (pas de sécurité réelle) #}
+    {% if is_granted('IS_AUTHENTICATED') %}
+    <a href="{{ path('app_logout') }}">Logout</a>
+    {# si pas connecté, lien vers login #}
+    {% else %}
+    <a href="{{ path('app_login') }}">Login</a>
+    {% endif %}
+</nav>
+```
+
+Ceci n'est que la partie front-end, si on souhaite inactiver la possibilité d'aller sur `/login` si on est connecté, on peut le faire au niveau du contrôleur :
+
+`src/Controller/SecurityController.php`
+```php
+# ...
+#[Route(path: '/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+
+        // si on est déjà connecté
+        if ($this->getUser()) {
+            // on retourne sur l'accueil
+            return $this->redirectToRoute('homepage');
+        }
+# ...
+```
+
+### On va twigger tout ça !
+
+Recherche de template
