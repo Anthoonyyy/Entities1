@@ -4,6 +4,7 @@
     {% block nav %}
         {% include 'admin/_menu.admin.html.twig' %}
     {% endblock %}
+    <!-- Page content-->
     <div class="container mt-5">
     <div class="row">
     <div class="col-lg-8">
@@ -11,15 +12,13 @@
 
     {% endblock %}
     {% block main %}
-        <!-- Page content-->
 
         <!-- Post content-->
-
         <article>
             <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->
-                <h1 class="fw-bolder mb-3">Welcome to Blog Post!</h1>
+                <h3 class="fw-bolder mb-3">Welcome to Blog Post!</h3>
                 <!-- Post meta content-->
                 <div class="text-muted fst-italic mb-2">Posted on January 1, 2023 by Start Bootstrap</div>
                 <!-- Post categories-->
@@ -27,7 +26,7 @@
                 <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
             </header>
             <!-- Preview image figure-->
-           <!-- <figure class="mb-4"><img class="img-fluid rounded" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..." /></figure>-->
+            <!--<figure class="mb-4"><img class="img-fluid rounded" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..." /></figure>-->
             <!-- Post content-->
             <section class="mb-5">
                 <p class="fs-5 mb-4">Science is an enterprise that should be cherished as an activity of the free human mind. Because it transforms who we are, how we live, and it gives us an understanding of our place in the universe.</p>
@@ -41,7 +40,7 @@
     {% endblock %}
     {% block comment %}
     {% endblock %}
-    {% block widget %}
+{% block widget %}
     </div>
     <!-- Side widgets-->
     <div class="col-lg-4">
@@ -51,18 +50,18 @@
         <div class="card-body">
             <div class="input-group">
                 <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                <button class="btn btn-primary" id="button-search" type="button">Cherchez</button>
+                <button class="btn btn-primary" id="button-search" type="button">Cherchez!</button>
             </div>
         </div>
     </div>
     <!-- Tags widget-->
     <div class="card mb-4">
-        <div class="card-header">Tags</div>
+        <div class="card-header">CRUD</div>
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-6">
                     <ul class="list-unstyled mb-0">
-                        <li><a href="#!">Web Design</a></li>
+                        <li><a href="{{ path('app_admin_section_index') }}">Crud Section</a></li>
                         <li><a href="#!">HTML</a></li>
                         <li><a href="#!">Freebies</a></li>
                     </ul>
@@ -77,16 +76,16 @@
             </div>
         </div>
     </div>
-    {% endblock %}
+{% endblock %}
     {% block endheader %}
         </div>
-      </div>
-    </div>
+        </div>
+        </div>
     {% endblock %}
     {% block footer %}
         <!-- Footer-->
         <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Entities1 {{ 'now'|date('Y') }}</p></div>
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; EntitiesG1 {{ 'now'|date('Y') }}</p></div>
         </footer>
     {% endblock %}
 {% endblock %}

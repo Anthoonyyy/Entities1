@@ -19,6 +19,8 @@ final class AdminSectionController extends AbstractController
     {
         return $this->render('admin_section/index.html.twig', [
             'sections' => $sectionRepository->findAll(),
+            'title' => 'Crud Section',
+            'homepage_text' => "Administration des sections par {$this->getUser()->getUsername()}",
         ]);
     }
 
@@ -39,6 +41,8 @@ final class AdminSectionController extends AbstractController
         return $this->render('admin_section/new.html.twig', [
             'section' => $section,
             'form' => $form,
+            'title' => 'Crud Section nouveau',
+            'homepage_text' => "Création d'une nouvelle section par {$this->getUser()->getUsername()}",
         ]);
     }
 
@@ -47,6 +51,8 @@ final class AdminSectionController extends AbstractController
     {
         return $this->render('admin_section/show.html.twig', [
             'section' => $section,
+            'title' => $section->getSectionTitle(),
+            'homepage_text' => "Administration des sections par {$this->getUser()->getUsername()}",
         ]);
     }
 
@@ -65,6 +71,8 @@ final class AdminSectionController extends AbstractController
         return $this->render('admin_section/edit.html.twig', [
             'section' => $section,
             'form' => $form,
+            'title' => 'Crud Section modification',
+            'homepage_text' => "Modification de la section {$section->getSectionTitle()} par {$this->getUser()->getUsername()}",
         ]);
     }
 
