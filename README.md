@@ -983,3 +983,46 @@ Une route vers un dossier `admin` a été créée, on va vérifier si un rôle l
 Dorénavant, ce dossier (et sous-dossiers sont accessibles que par les `ROLE_ADMIN`)
 
 https://symfony.com/doc/current/security.html#roles
+
+
+## Création d'un contrôleur pour Admin
+
+    php bin/console make:controller AdminController
+
+On modifie le fichier pour passer certaines variables:
+
+    src/Controller/AdminController.php
+
+```php
+# ...
+class AdminController extends AbstractController
+{
+    #[Route('/admin', name: 'app_admin')]
+    public function index(): Response
+    {
+        return $this->render('admin/index.html.twig', [
+            'title' => 'Administration',
+            'homepage_text' => "Bienvenue {$this->getUser()->getUsername()}",
+        ]);
+    }
+}
+# ...
+```
+
+On duplique  `templates/template.front.html.twig` en `templates/template.back.html.twig`, On modifie ce template en suivant les besoins
+
+On modifie `templates/admin/index.html.twig` pour le faire correspondre aux variables du contrôleur
+
+```twig
+{% extends 'template.back.html.twig' %}
+
+{% block title %}{{ parent() }} | {{ title }}{% endblock %}
+
+{% block header %}
+
+    <h1 class="text-center mt-5">{{ title }}</h1>
+    <p class="text-center mt-5 pt-1">{{ homepage_text }}</p>
+{% endblock %}
+
+```
+
