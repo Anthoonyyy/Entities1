@@ -9,4 +9,8 @@
 
 <h1 class="text-center mt-5">{{ title }}</h1>
     <p class="text-center mt-5 pt-1">{{ homepage_text }}</p>
+
+{% endblock %}
+{% block main %}
+    {{ dump(posts) }}
 {% endblock %}

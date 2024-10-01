@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Post;
 use App\Entity\Section;
+use App\Entity\Tag;
+use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,27 +20,26 @@ class PostType extends AbstractType
             ->add('postText')
             ->add('postDateCreated', null, [
                 'widget' => 'single_text',
-                # si on ne le remplit pas, on envoie la date actuelle
-                'empty_data' => date('Y-m-d H:i:s'),
-                # non obligation de le remplir
-                'required' => false,
+                'empty_data' => date('Y-m-d'),
             ])
-
             ->add('postDatePublished', null, [
                 'widget' => 'single_text',
             ])
-            // en supprimant ce add, on doit modifier AdminPostController pour
-            // donner une valeur par défaut à postIsPublished
-            //->add('postIsPublished')
-
+            ->add('postIsPublished')
             ->add('sections', EntityType::class, [
                 'class' => Section::class,
+                'choice_label' => 'sectionTitle',
+                'multiple' => true,
+                'expanded' => true
+            ])/*
+            ->add('tags', EntityType::class, [
+                'class' => Tag::class,
                 'choice_label' => 'id',
                 'multiple' => true,
-                # affichage en checkbox
-                'expanded' => true,
-                # non obligatoire
-                'required' => false,
+            ])*/
+            ->add('user', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'username',
             ])
         ;
     }
